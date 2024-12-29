@@ -1,0 +1,6 @@
+# buildDotnetModule output from default.nix
+result
+packages
+
+# direnv
+.direnv/
