@@ -1,6 +1,6 @@
 with import <nixpkgs> {};
   buildDotnetModule rec {
-    pname = "ConsoleLogger";
+    pname = "ConsoleLogger-Server";
     version = "0.1";
     src = ./.;
     projectFile = "./src/Server/Server.csproj";

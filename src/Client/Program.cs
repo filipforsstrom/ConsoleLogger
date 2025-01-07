@@ -1,13 +1,14 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-if (args.Length == 0)
+if (args.Length < 2 || args.Contains("-h") || args.Contains("--help"))
 {
-	Console.WriteLine("Please provide the path to the file as a command line argument.");
+	Console.WriteLine("Usage: cl-client <host> <file_path>");
 	return;
 }
 
-string filePath = args[0];
+string host = args[0];
+string filePath = args[1];
 string directoryPath = Path.GetDirectoryName(filePath) ?? string.Empty;
 if (directoryPath == null)
 {
@@ -31,10 +32,10 @@ while (Console.Read() != 'q') ;
 
 void OnChanged(object sender, FileSystemEventArgs e)
 {
-	HandleFileChange(e, pos).Wait();
+	HandleFileChange(e, pos, host).Wait();
 }
 
-static async Task HandleFileChange(FileSystemEventArgs e, Position pos)
+static async Task HandleFileChange(FileSystemEventArgs e, Position pos, string host)
 {
 	// Console.WriteLine(fileState.LastReadPosition);
 	using FileStream fs = new(e.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -45,7 +46,7 @@ static async Task HandleFileChange(FileSystemEventArgs e, Position pos)
 	Console.Write(text);
 	using HttpClient client = new();
 	var content = new StringContent(JsonSerializer.Serialize(new { text }), Encoding.UTF8, "application/json");
-	HttpResponseMessage response = await client.PostAsync("http://localhost:5147/log", content);
+	HttpResponseMessage response = await client.PostAsync($"{host}/log", content);
 	response.EnsureSuccessStatusCode();
 }
 
